@@ -1,6 +1,6 @@
 
 
-function HELLO(reply, response, payload, extra = {}) {
+function HELLO(payload, reply, response, extra = {}) {
     let { foo } = payload;
     response(`Hello, ${foo}`);
 }

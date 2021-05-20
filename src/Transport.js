@@ -135,7 +135,7 @@ class Transport {
         };
 
         if (this.#endpoints[cmd]) {
-            this.#endpoints[cmd].call(null, _reply, _response, payload, _extra);
+            this.#endpoints[cmd].call(null, payload, _reply, _response, _extra);
         }
     }
     #handleResponse = async (id, payload) => {

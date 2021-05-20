@@ -33,7 +33,8 @@ class Transport {
         this.#endpoints = endpoints;
 
         Object.keys(presets).forEach(key => {
-            this.interface[key] = presets[key].bind(this);
+            presets[key] = presets[key].bind(this);
+            // this.interface[key] = presets[key].bind(this);
         })
 
         this.#connection.getSubscriber().subscribe(TOPICS.GENERAL);

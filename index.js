@@ -9,17 +9,21 @@ const _config = {
         port: 6379,
         options: {}
     },
-    nodeName: TOPICS.GENERAL
+    transport: {
+        nodeName: TOPICS.GENERAL,
+        debug: false
+    }
 }
 
-let _connection = null;
-let _transport = null;
-
 async function createTransport(config = _config, incoming, outgoing) {
-    _connection = new Connection(config.connection.port, config.connection.host, config.connection.options);
-    _transport = new Transport(_connection, _config.nodeName, incoming, outgoing);
+    const _connection = new Connection(config.connection.port, config.connection.host, config.connection.options);
+    const _transport = new Transport(_connection, incoming, outgoing, config.transport);
+
+    return _transport;
 }
 
 module.exports = {
-    createTransport
+    createTransport,
+    Transport,
+    REQUEST_TYPES
 };

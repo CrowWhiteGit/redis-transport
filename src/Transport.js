@@ -17,7 +17,7 @@ class Transport {
      * @param {TOPICS} serviceName 
      * @param {{}} endpoints 
      */
-    constructor(connection, serviceName, endpoints, presets) {
+    constructor(connection, endpoints, presets, config) {
         if (!connection) {
             throw new Error('Pass an instance of Connection');
         }
@@ -29,7 +29,8 @@ class Transport {
         }
 
         this.#connection = connection;
-        this.#serviceName = serviceName;
+        this.#serviceName = config.nodeName;
+        this.#debug = config.debug;
         this.#endpoints = endpoints;
 
         Object.keys(presets).forEach(key => {
@@ -37,10 +38,14 @@ class Transport {
             // this.interface[key] = presets[key].bind(this);
         })
 
-        this.#connection.getSubscriber().subscribe(TOPICS.GENERAL);
-        this.#connection.getSubscriber().subscribe(this.#serviceName);
+        let sub = this.#connection.getSubscriber();
 
-        this.#connection.getSubscriber().on('message', this.#handleMessage);
+        sub.subscribe(TOPICS.GENERAL);
+        sub.subscribe(this.#serviceName);
+
+        sub.on('message', this.#handleMessage);
+        
+        if(this.#debug) console.log('Service name:', this.#serviceName);
     }
 
     notify = async (channel, cmd, payload = {}) => {
@@ -63,6 +68,8 @@ class Transport {
 
         this.#requests[reqId] = cb;
 
+        if(this.#debug) console.log(`Channel: ${channel}\nCommand: ${cmd}\nRequest id: ${reqId}`);
+
         this.#connection.getPublisher().publish(channel, JSON.stringify(msg));
     };
     #response = async (channel, id, payload) => {
@@ -84,6 +91,8 @@ class Transport {
 
     #handleMessage = async (channel, message) => {
         const { id = null, sender = null, type = REQUEST_TYPES.NOTIFY, cmd = null, payload = {} } = JSON.parse(message);
+
+        if(this.#debug) console.log(`Got message ${sender} ${type}, ${cmd}`)
 
         if (this.#debug) {
             console.log(type, 'request');

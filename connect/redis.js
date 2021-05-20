@@ -29,13 +29,16 @@ class Connection {
         this.subscriber.on('error', (err) => {
             console.log(err);
         });
+
+        this.getPublisher = this.getPublisher.bind(this);
+        this.getSubscriber = this.getSubscriber.bind(this);
     }
 
-    getPublisher = () => {
+    getPublisher() {
         return this.publisher;
     }
 
-    getSubscriber = () => {
+    getSubscriber() {
         return this.subscriber;
     }
 }

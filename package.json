@@ -1,0 +1,20 @@
+{
+  "name": "redis-transport",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CrowWhiteGit"
+  },
+  "author": "CrowWhite",
+  "license": "ISC",
+  "dependencies": {
+    "bluebird": "^3.7.2",
+    "redis": "^3.1.2",
+    "uuid": "^8.3.2"
+  }
+}

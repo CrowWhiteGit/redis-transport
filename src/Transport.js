@@ -44,8 +44,8 @@ class Transport {
         sub.subscribe(this.#serviceName);
 
         sub.on('message', this.#handleMessage);
-        
-        if(this.#debug) console.log('Service name:', this.#serviceName);
+
+        if (this.#debug) console.log('Service name:', this.#serviceName);
     }
 
     notify = async (channel, cmd, payload = {}) => {
@@ -54,6 +54,12 @@ class Transport {
             type: REQUEST_TYPES.NOTIFY,
             cmd, payload
         };
+
+        let numsub = await this.#connection.numSub(channel);
+        if (numsub[1] == 0) {
+            throw new Error(`Target channel ${channel} is not active`);
+        }
+
         this.#connection.getPublisher().publish(channel, JSON.stringify(msg));
     };
     request = async (channel, cmd, payload = {}, cb) => {
@@ -68,7 +74,12 @@ class Transport {
 
         this.#requests[reqId] = cb;
 
-        if(this.#debug) console.log(`Channel: ${channel}\nCommand: ${cmd}\nRequest id: ${reqId}`);
+        if (this.#debug) console.log(`Channel: ${channel}\nCommand: ${cmd}\nRequest id: ${reqId}`);
+
+        let numsub = await this.#connection.numSub(channel);
+        if (numsub[1] == 0) {
+            throw new Error(`Target channel ${channel} is not active`);
+        }
 
         this.#connection.getPublisher().publish(channel, JSON.stringify(msg));
     };
@@ -92,7 +103,7 @@ class Transport {
     #handleMessage = async (channel, message) => {
         const { id = null, sender = null, type = REQUEST_TYPES.NOTIFY, cmd = null, payload = {} } = JSON.parse(message);
 
-        if(this.#debug) console.log(`Got message ${sender} ${type}, ${cmd}`)
+        if (this.#debug) console.log(`Got message ${sender} ${type}, ${cmd}`)
 
         if (this.#debug) {
             console.log(type, 'request');

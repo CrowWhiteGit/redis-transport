@@ -32,6 +32,7 @@ class Connection {
 
         this.getPublisher = this.getPublisher.bind(this);
         this.getSubscriber = this.getSubscriber.bind(this);
+        this.numSub = this.numSub.bind(this);
     }
 
     getPublisher() {
@@ -40,6 +41,15 @@ class Connection {
 
     getSubscriber() {
         return this.subscriber;
+    }
+
+    numSub(topic) {
+        return new Promise((resolve, reject) => {
+            this.publisher.pubsub('NUMSUB', topic, function (err, result) {
+                if(err) reject(err);
+                resolve(result);
+            });
+        })
     }
 }
 

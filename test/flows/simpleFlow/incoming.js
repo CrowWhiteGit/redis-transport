@@ -1,8 +1,8 @@
 
 
-function HELLO(payload, reply, response, extra = {}) {
-    let { foo } = payload;
-    response(`Hello, ${foo}`);
+function HELLO(req, res) {
+    let { foo } = req.payload;
+    res.response(`Hello, ${foo}`);
 }
 
 

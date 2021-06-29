@@ -33,6 +33,8 @@ class Connection {
         this.getPublisher = this.getPublisher.bind(this);
         this.getSubscriber = this.getSubscriber.bind(this);
         this.numSub = this.numSub.bind(this);
+        // this.authenticate = this.authenticate.bind(this);
+        // this.authorize = this.authorize.bind(this);
     }
 
     getPublisher() {
@@ -43,10 +45,20 @@ class Connection {
         return this.subscriber;
     }
 
+    // async authenticate(id, session) {
+    //     this.publisher.setAsync(`nodes:${id}`, session);
+    // }
+
+    // async authorize(id) {
+    //     if (!id) return {};
+    //     const session = await this.publisher.getAsync(`nodes:${id}`);
+    //     return session ? JSON.parse(session) : {};
+    // }
+
     numSub(topic) {
         return new Promise((resolve, reject) => {
             this.publisher.pubsub('NUMSUB', topic, function (err, result) {
-                if(err) reject(err);
+                if (err) reject(err);
                 resolve(result);
             });
         })

@@ -111,11 +111,13 @@ class Transport {
 
         switch (type) {
             case REQUEST_TYPES.NOTIFY: {
-                await this.#handleNotify(cmd, payload);
+                let req = { cmd, payload };
+                await this.#handleNotify(cmd, req);
                 break;
             }
             case REQUEST_TYPES.REQUEST: {
-                await this.#handleRequest(id, sender, cmd, payload);
+                let req = { cmd, payload };
+                await this.#handleRequest(id, sender, cmd, req);
                 break;
             }
             case REQUEST_TYPES.RESPONSE: {
@@ -129,24 +131,27 @@ class Transport {
         }
     }
 
-    #handleNotify = async (cmd, payload) => {
+    #handleNotify = async (cmd, req) => {
         if (this.#endpoints[cmd]) {
-            this.#endpoints[cmd].call(null, payload);
+            this.#endpoints[cmd].call(null, req);
         }
     }
-    #handleRequest = async (id, sender, cmd, payload) => {
-        let _reply = async (data) => {
-            this.#reply.call(this, sender, id, data);
-        };
-        let _response = async (data) => {
-            this.#response.call(this, sender, id, data);
-        };
-        let _extra = {
+    #handleRequest = async (id, sender, cmd, req) => {
+        req.extra = {
             id, sender, cmd
         };
 
+        let res = {
+            reply: async (data) => {
+                this.#reply.call(this, sender, id, data);
+            },
+            response: async (data) => {
+                this.#response.call(this, sender, id, data);
+            }
+        };
+
         if (this.#endpoints[cmd]) {
-            this.#endpoints[cmd].call(null, payload, _reply, _response, _extra);
+            this.#endpoints[cmd].call(null, req, res);
         }
     }
     #handleResponse = async (id, payload) => {

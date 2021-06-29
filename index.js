@@ -15,7 +15,7 @@ const _config = {
     }
 }
 
-async function createTransport(config = _config, incoming, outgoing) {
+function createTransport(config = _config, incoming, outgoing) {
     const _connection = new Connection(config.connection.port, config.connection.host, config.connection.options);
     const _transport = new Transport(_connection, incoming, outgoing, config.transport);
 

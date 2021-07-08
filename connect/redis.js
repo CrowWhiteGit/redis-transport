@@ -1,5 +1,6 @@
 
 const redis = require('redis');
+
 const bluebird = require('bluebird');
 
 bluebird.promisifyAll(redis.RedisClient.prototype);
@@ -20,6 +21,9 @@ class Connection {
     // options = {};
 
     constructor(port = 6379, host = "127.0.0.1", options = {}) {
+
+        options.retry_strategy = retryStrategy;
+
         this.publisher = redis.createClient(port, host, options);
         this.subscriber = redis.createClient(port, host, options);
 
@@ -37,13 +41,27 @@ class Connection {
         // this.authorize = this.authorize.bind(this);
     }
 
+    /**
+     * @returns {redis.RedisClient}
+     */
     getPublisher() {
         return this.publisher;
     }
 
+    /**
+    * @returns {redis.RedisClient}
+    */
     getSubscriber() {
         return this.subscriber;
     }
+
+    // /**
+    //  * @private
+    //  * @param {redis.RedisClient} clientRef 
+    //  */
+    // handleError(clientRef) {
+    //     clientRef.quit();
+    // }
 
     // async authenticate(id, session) {
     //     this.publisher.setAsync(`nodes:${id}`, session);
@@ -64,5 +82,13 @@ class Connection {
         })
     }
 }
+
+function retryStrategy(options) {
+    // if (options.attempt > 10) {
+    //     return undefined;
+    // }
+    // console.log(`[${(new Date()).toUTCString()}] Reconnecting, ${options.attempt} attempt...`);
+    return Math.min(options.attempt * 100, 3000);
+};
 
 module.exports = Connection;
